@@ -1,20 +1,18 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import styles from "./queryPage.module.css";
+import { getPosts } from "../utill/httpApi";
+import Detail from "../detail/detail";
 
 interface PostType {
   title: string;
+  id: number;
 }
 
 export default function QueryPage() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectPost, setSelectPost] = useState(0);
 
-  async function getData(page: number) {
-    const response = await fetch(
-      `https://jsonplaceholder.typicode.com/posts?_page=${page}`
-    );
-
-    return response.json();
-  }
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -22,23 +20,30 @@ export default function QueryPage() {
       const nextPage = currentPage + 1;
       queryClient.prefetchQuery({
         queryKey: ["posts", nextPage],
-        queryFn: () => getData(nextPage),
+        queryFn: () => getPosts(nextPage),
       });
     }
   }, [queryClient, currentPage]);
 
   const { data, isLoading } = useQuery<PostType[]>({
     queryKey: ["posts", currentPage],
-    queryFn: () => getData(currentPage),
+    queryFn: () => getPosts(currentPage),
   });
 
   if (isLoading) return <div>Loading...</div>;
 
   return (
     <div>
-      {data?.map((item, index) => (
-        <li key={index}>{item.title}</li>
-      ))}
+      <div>
+        {data?.map((item) => (
+          <div key={item.id}>
+            <li
+              onClick={() => setSelectPost(item.id)}
+              className={styles.li}
+            >{`id: ${item.id} - ${item.title}`}</li>
+          </div>
+        ))}
+      </div>
       <button
         disabled={currentPage <= 1}
         onClick={() => setCurrentPage((pre) => pre - 1)}
@@ -51,6 +56,8 @@ export default function QueryPage() {
       >
         다음 페이지
       </button>
+      <hr></hr>
+      {selectPost && <Detail id={selectPost} />}
     </div>
   );
 }
