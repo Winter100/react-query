@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import styles from "./queryPage.module.css";
-import { deleteMethod, getPosts, updateMethod } from "../utill/httpApi";
-import Detail from "../detail/detail";
+import { deleteMethod, getPosts, updateMethod } from "../../utill/httpApi";
+import Detail from "../../detail/detail";
+import HeaderContent from "../header/header";
 
 interface PostType {
   title: string;
@@ -42,8 +43,20 @@ export default function QueryPage() {
 
   if (isLoading) return <div>Loading...</div>;
 
+  const headerContent = {
+    title: "기본 쿼리 페이지에서 해본 것",
+    content: [
+      "1. 데이터 받아오기",
+      "2. 클릭시 상세 데이터 받아오기",
+      "3. 데이터 삭제 및 업데이트",
+      "4. 삭제 및 업데이트 시 각 상태 초기화",
+      "5. PreFetching",
+    ],
+  };
+
   return (
     <div>
+      <HeaderContent headerContent={headerContent} />
       <div>
         {data?.map((item) => (
           <div key={item.id}>
