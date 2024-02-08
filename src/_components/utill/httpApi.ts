@@ -12,3 +12,18 @@ export async function getDetail(id: number) {
 
   return response.json();
 }
+export async function deleteMethod(id: number): Promise<void> {
+  await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+    method: "DELETE",
+  });
+
+  return;
+}
+export async function updateMethod(id: number): Promise<void> {
+  await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ title: "업데이트..." }),
+  });
+
+  return;
+}

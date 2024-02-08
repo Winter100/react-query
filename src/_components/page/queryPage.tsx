@@ -1,7 +1,7 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import styles from "./queryPage.module.css";
-import { getPosts } from "../utill/httpApi";
+import { deleteMethod, getPosts, updateMethod } from "../utill/httpApi";
 import Detail from "../detail/detail";
 
 interface PostType {
@@ -14,6 +14,16 @@ export default function QueryPage() {
   const [selectPost, setSelectPost] = useState(0);
 
   const queryClient = useQueryClient();
+
+  //삭제 mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteMethod(id),
+  });
+
+  //업데이트 mutation
+  const updateMutation = useMutation({
+    mutationFn: (id) => updateMethod(id),
+  });
 
   useEffect(() => {
     if (currentPage < 10) {
@@ -38,7 +48,12 @@ export default function QueryPage() {
         {data?.map((item) => (
           <div key={item.id}>
             <li
-              onClick={() => setSelectPost(item.id)}
+              onClick={() => {
+                //업데이트 및 삭제 mutation의 상태를 초기화 해줌
+                deleteMutation.reset();
+                updateMutation.reset();
+                setSelectPost(item.id);
+              }}
               className={styles.li}
             >{`id: ${item.id} - ${item.title}`}</li>
           </div>
@@ -57,7 +72,13 @@ export default function QueryPage() {
         다음 페이지
       </button>
       <hr></hr>
-      {selectPost && <Detail id={selectPost} />}
+      {selectPost && (
+        <Detail
+          id={selectPost}
+          deleteMutation={deleteMutation}
+          updateMutation={updateMutation}
+        />
+      )}
     </div>
   );
 }
